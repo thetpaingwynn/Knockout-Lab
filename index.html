@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Knockout Labs</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="css/justified-nav.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/ko-select.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="masthead">
+            <h3 class="text-muted">Knockout Labs</h3>
+            <ul class="nav nav-justified">
+                <li class="active"><a href="#">Home</a>
+                </li>
+                <li><a href="#">Multi Select Dropdown</a>
+                </li>
+                <li><a href="#"> - </a>
+                </li>
+                <li><a href="#"> - </a>
+                </li>
+                <li><a href="#"> - </a>
+                </li>
+                <li><a href="#"> - </a>
+                </li>
+            </ul>
+        </div>
+        Select: <div id="dropdown3" style="width: 200px" data-bind="koSelect: $data"></div>
+
+    </div>
+    <!-- /container -->
+
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/knockout/dist/knockout.js"></script>
+    <script src="js/ko.filters.js"></script>
+    <script src="js/ko-select.js"></script>
+    <script src="js/index.js"></script>
+</body>
+
+</html>

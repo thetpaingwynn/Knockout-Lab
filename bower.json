@@ -1,0 +1,21 @@
+{
+  "name": "knockoutlab",
+  "version": "0.0.1",
+  "authors": [
+    "Thet Paing Wynn"
+  ],
+  "license": "MIT",
+  "homepage": "http://zabudipar.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "knockout": "~3.1.0",
+    "bootstrap": "2.3.2"
+  }
+}

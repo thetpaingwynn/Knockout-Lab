@@ -1,0 +1,91 @@
+.ko-select-choosed-container ul.ko-select-choosed {
+    height: auto !important;
+    height: 1%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    border: 1px solid #aaa;
+    cursor: text;
+    overflow: hidden;
+    background-color: #fff;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eeeeee), color-stop(15%, #ffffff));
+    background-image: -webkit-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+    background-image: -moz-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+    background-image: -o-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+    background-image: -ms-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+    background-image: linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+}
+.ko-select-choosed li {
+    float: left;
+    list-style: none;
+}
+.ko-select-choosed-item {
+    float: left;
+    background-color: #e4e4e4;
+    padding: 3px 5px 3px 18px;
+    margin: 3px 0 3px 5px;
+    position: relative;
+    line-height: 13px;
+    color: #333;
+    cursor: default;
+    border: 1px solid #aaaaaa;
+    border-radius: 3px;
+}
+.ko-select-remove-choosed-item {
+    display: block;
+    width: 12px;
+    height: 13px;
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    left: 3px;
+    font-size: 1px;
+    outline: none;
+    background: url('../img/ko-select.png') right top no-repeat;
+}
+.ko-select-remove-choosed-item:hover {
+    background-position: right -11px;
+}
+.ko-select-close-dropdown {
+    display: block;
+    width: 16px;
+    height: 26px;
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    font-size: 1px;
+    outline: none;
+    background: url('../img/ko-select.png') no-repeat 0 1px;
+}
+.ko-select-close-dropdown:hover {
+    /*    background-position: -11px;    */
+}
+.ko-select-searchbox {} .ko-select-searchbox .ko-select-input {
+    width: 25px;
+    padding: 5px;
+    outline: 0;
+    border: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background: transparent !important;
+}
+.ko-select-list {
+    margin: 0;
+    padding: 2px 2px 2px 5px;
+    height: 200px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    position: absolute;
+    z-index: 9999;
+    background-color: #fff;
+    width: 200px;
+}
+.ko-select-list-item {
+    list-style: none;
+    display: list-item;
+    line-height: 20px;
+    cursor: pointer;
+}
+.ko-select {
+    width: 350px;
+}
