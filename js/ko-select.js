@@ -3,7 +3,6 @@ ko.bindingHandlers.fadeVisible = {
         // Initially set the element to be instantly visible/hidden depending on the value
         var value = valueAccessor();
         $(element).toggle(ko.unwrap(value)); // Use "unwrapObservable" so we can handle values that may or may not be observable
-
     },
     update: function (element, valueAccessor) {
         // Whenever the value subsequently changes, slowly fade the element in or out
@@ -33,7 +32,7 @@ ko.bindingHandlers.koSelect = {
     createNodes: function (rootElement, options) {
 
         // dropdown template
-        var template = '<script id="ko-select-tmpl" type="text/html"><div class="ko-select-choosed-container"><ul class="ko-select-choosed"><!-- ko foreach: dataSource.filter(\'true\', \'selected\') --><li class="ko-select-choosed-item"><span data-bind="text: text"></span><a href="#" class="ko-select-remove-choosed-item" data-bind="click: $parent.unSelect"></a></li><!-- /ko --><li class="ko-select-searchbox"><input data-bind="value: search, valueUpdate: \'afterkeydown\', hasFocus: hasFocus, event: { keypress: searchKeypress }, style: { width: searchBoxWidth() + \'px\' }" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="ko-select-input" tabindex="0" placeholder=""><a href="#" class="ko-select-close-dropdown" data-bind="click: $data.toggleDropdown"></a></li></ul></div><ul data-bind="foreach: dataSource.filter(search, \'text\'), fadeVisible: isShowDropDown, style: { width: dropdownWidth() + \'px\' }" class="ko-select-list"><li class="ko-select-list-item" data-bind="click: $parent.listItemClick"><input type="checkbox" data-bind="checked: selected"><span data-bind="text: text"></span></li></ul></script>';
+        var template = '<script id="ko-select-tmpl" type="text/html"><div class="ko-select-choosed-container"><ul class="ko-select-choosed"><!-- ko foreach: dataSource.filter(\'true\', \'selected\') --><li class="ko-select-choosed-item"><span data-bind="text: text"></span><a href="#" class="ko-select-remove-choosed-item" data-bind="click: $parent.unSelect"></a></li><!-- /ko --><li class="ko-select-searchbox"><input data-bind="value: search, valueUpdate: \'afterkeydown\', hasFocus: hasFocus, event: { keypress: searchKeypress }, style: { width: searchBoxWidth() + \'px\' }" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="ko-select-input" tabindex="0" placeholder=""><a href="#" class="ko-select-close-dropdown" data-bind="click: $data.toggleDropdown"></a></li></ul></div><ul data-bind="foreach: dataSource.filter(search, \'text\'), fadeVisible: isShowDropDown, style: { width: dropdownWidth() + \'px\', height: dropdownHeight() + \'px\' }" class="ko-select-list"><li class="ko-select-list-item" data-bind="click: $parent.listItemClick"><input type="checkbox" data-bind="checked: selected"><span data-bind="text: text"></span></li></ul></script>';
 
         //append templates
         if (!document.getElementById('ko-select-tmpl')) {
@@ -81,6 +80,7 @@ ko.bindingHandlers.koSelect = {
             var self = this;
 
             self.defautValue = "0";
+            self.dropHeight = allBindings().dropdownHeight || 200;
 
             self.dataSource = ko.observableArray();
             self.search = ko.observable("")
@@ -109,9 +109,11 @@ ko.bindingHandlers.koSelect = {
             self.showSelectedItems = true;
             self.searchBoxWidth = ko.observable(100);
             self.dropdownWidth = ko.observable($(element).width());
+            self.dropdownHeight = ko.observable(0);
             self.hasFocus = ko.observable(false);
             self.hasFocus.subscribe(function (newValue) {
                 if (newValue) {
+                    self.dropdownHeight(self.dropHeight);
                     self.isShowDropDown(false);
                 }
             });
@@ -189,6 +191,7 @@ ko.bindingHandlers.koSelect = {
                 self.isShowDropDown(true);
             }
             self.toggleDropdown = function () {
+                self.dropdownHeight(self.dropHeight);
                 self.isShowDropDown(!self.isShowDropDown());
                 self.showSearchBox(self.isShowDropDown());
                 self.clearSearch();
