@@ -33,27 +33,6 @@
     </div>
     <!-- /container -->
 
-    <script id="ko-select-tmpl" type="text/html">
-        <div class="ko-select-choosed-container">
-            <ul class="ko-select-choosed">
-                <!-- ko foreach: dataSource.filter('true', 'selected') -->
-                <li class="ko-select-choosed-item"><span data-bind="text: text"></span>
-                    <a href="#" class="ko-select-remove-choosed-item" data-bind="click: $parent.unSelect"></a>
-                </li>
-                <!-- /ko -->
-                <li class="ko-select-searchbox">
-                    <input data-bind="value: search, valueUpdate: 'afterkeydown', hasFocus: hasFocus, event: { keypress: searchKeypress }, style: { width: searchBoxWidth() + 'px' }" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="ko-select-input" tabindex="0" placeholder="">
-                    <a href="#" class="ko-select-close-dropdown" data-bind="click: $data.toggleDropdown"></a>
-                </li>
-            </ul>
-        </div>
-        <ul data-bind="foreach: dataSource.filter(search, 'text'), fadeVisible: isShowDropDown, style: { width: dropdownWidth() + 'px' }" class="ko-select-list">
-            <li class="ko-select-list-item">
-                <input type="checkbox" data-bind="checked: selected , event: { change: $parent.selectedItemChanged }"><span data-bind="text: text"></span>
-            </li>
-        </ul>
-    </script>
-
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/knockout/dist/knockout.js"></script>
     <script src="js/ko.filters.js"></script>
