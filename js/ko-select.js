@@ -32,11 +32,14 @@ ko.bindingHandlers.koSelect = {
     },
     createNodes: function (rootElement, options) {
 
-        var template = '<script id="ko-select-tmpl" type="text/html"><div class="ko-select-choosed-container" ><ul class="ko-select-choosed"><!-- ko foreach: dataSource.filter(\'true\', \'selected\') --><li class="ko-select-choosed-item"><span data-bind="text: text"></span><a href="#" class="ko-select-remove-choosed-item" data-bind="click: $parent.unSelect"></a></li><!-- /ko --><li class="ko-select-searchbox"><input data-bind="value: search, valueUpdate: \'afterkeydown\', hasFocus: hasFocus, event: { keypress: searchKeypress }, style: { width: searchBoxWidth() + \'px\' }" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="ko-select-input" tabindex="0" placeholder=""><a href="#" class="ko-select-close-dropdown" data-bind="click: $data.toggleDropdown"></a></li></ul></div><ul data-bind="foreach: dataSource.filter(search, \'text\'), fadeVisible: isShowDropDown, style: { width: dropdownWidth() + \'px\' }" class="ko-select-list"><li class="ko-select-list-item" data-bind="click: $parent.listItemClick"><input type="checkbox" data-bind="checked: selected , event: { change: $parent.selectedItemChanged }"><span data-bind="text: text"></span></li></ul></script>';
+        // dropdown template
+        var template = '<script id="ko-select-tmpl" type="text/html"><div class="ko-select-choosed-container"><ul class="ko-select-choosed"><!-- ko foreach: dataSource.filter(\'true\', \'selected\') --><li class="ko-select-choosed-item"><span data-bind="text: text"></span><a href="#" class="ko-select-remove-choosed-item" data-bind="click: $parent.unSelect"></a></li><!-- /ko --><li class="ko-select-searchbox"><input data-bind="value: search, valueUpdate: \'afterkeydown\', hasFocus: hasFocus, event: { keypress: searchKeypress }, style: { width: searchBoxWidth() + \'px\' }" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="ko-select-input" tabindex="0" placeholder=""><a href="#" class="ko-select-close-dropdown" data-bind="click: $data.toggleDropdown"></a></li></ul></div><ul data-bind="foreach: dataSource.filter(search, \'text\'), fadeVisible: isShowDropDown, style: { width: dropdownWidth() + \'px\' }" class="ko-select-list"><li class="ko-select-list-item" data-bind="click: $parent.listItemClick"><input type="checkbox" data-bind="checked: selected"><span data-bind="text: text"></span></li></ul></script>';
+
         //append templates
         if (!document.getElementById('ko-select-tmpl')) {
             document.body.insertAdjacentHTML('beforeend', template);
         }
+
         //apply first binding
         ko.applyBindingsToNode(rootElement, {
             template: {
@@ -137,8 +140,9 @@ ko.bindingHandlers.koSelect = {
                             if (item) {
 
                                 // If the last selected item is default Value, deselect others
-                                if (!item.selected() && item.value() === self.defautValue) {
-                                    data.selected(false);
+                                if (item.selected() && item.value() === self.defautValue) {
+                                    if(item.value() !== data.value())
+                                        data.selected(false);
                                 }
 
                                 // If the last selected item is not default Value, deselect default
@@ -161,7 +165,7 @@ ko.bindingHandlers.koSelect = {
 
                     });
 
-                    if (item && !item.selected()) {
+                    if (item && item.selected()) {
                         selectedValues.push(item.value());
                         selectedText.push(item.text());
                     }
@@ -196,11 +200,20 @@ ko.bindingHandlers.koSelect = {
                 self.searchBoxWidth(width + 10);
                 return true;
             }
+            self.listItemClick = function(item, e){
 
-            self.listItemClick = function(item){
-                self.selectedItemChanged(item);
-                item.selected(!item.selected());
-                $(element).trigger('change');
+                if(e.target && e.target.type === "checkbox"){
+                    self.selectedItemChanged(item);
+                    $(element).trigger('change');
+                    return true;
+                }
+                else {
+                    item.selected(!item.selected());
+                    self.selectedItemChanged(item);
+                    $(element).trigger('change');
+                    return false;
+                }
+
             };
 
             if (data) {
