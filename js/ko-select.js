@@ -17,6 +17,19 @@ ko.bindingHandlers.fadeVisible = {
 };
 
 ko.bindingHandlers.koSelect = {
+    viewModel: function (data) {
+        var self = this;
+        self.listData = ko.observableArray(data || []);
+        self.removeAll = function () {
+            self.listData.removeAll();
+        };
+        self.add = function (data) {
+            this.listData.push(data);
+        };
+        self.addRange = function (data) {
+            ko.utils.arrayPushAll(this.listData, data);
+        };
+    },
     createNodes: function (rootElement, options) {
 
         var template = '<script id="ko-select-tmpl" type="text/html"><div class="ko-select-choosed-container" ><ul class="ko-select-choosed"><!-- ko foreach: dataSource.filter(\'true\', \'selected\') --><li class="ko-select-choosed-item"><span data-bind="text: text"></span><a href="#" class="ko-select-remove-choosed-item" data-bind="click: $parent.unSelect"></a></li><!-- /ko --><li class="ko-select-searchbox"><input data-bind="value: search, valueUpdate: \'afterkeydown\', hasFocus: hasFocus, event: { keypress: searchKeypress }, style: { width: searchBoxWidth() + \'px\' }" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="ko-select-input" tabindex="0" placeholder=""><a href="#" class="ko-select-close-dropdown" data-bind="click: $data.toggleDropdown"></a></li></ul></div><ul data-bind="foreach: dataSource.filter(search, \'text\'), fadeVisible: isShowDropDown" class="ko-select-list"><li class="ko-select-list-item"><input type="checkbox" data-bind="checked: selected , event: { change: $parent.selectedItemChanged }"><span data-bind="text: text"></span></li></ul></script>';
@@ -31,7 +44,29 @@ ko.bindingHandlers.koSelect = {
             }
         }, options);
     },
-    init: function (element, valueAccessor) {
+    measureTextWidth: function (value) {
+        if (!sizer) {
+            var style = e[0].currentStyle || window.getComputedStyle(e[0], null);
+            sizer = $(document.createElement("div")).css({
+                position: "absolute",
+                left: "-10000px",
+                top: "-10000px",
+                display: "none",
+                fontSize: style.fontSize,
+                fontFamily: style.fontFamily,
+                fontStyle: style.fontStyle,
+                fontWeight: style.fontWeight,
+                letterSpacing: style.letterSpacing,
+                textTransform: style.textTransform,
+                whiteSpace: "nowrap"
+            });
+            sizer.attr("class", "select2-sizer");
+            $("body").append(sizer);
+        }
+        sizer.text(value.val());
+        return sizer.width();
+    },
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
 
         var listItem = function (data) {
             this.text = ko.observable(data.Text || "");
@@ -46,13 +81,40 @@ ko.bindingHandlers.koSelect = {
 
             self.dataSource = ko.observableArray();
             self.search = ko.observable("")
+            self.addRange = function (data) {
+                self.dataSource.removeAll();
+                data.forEach(function (value) {
+                    var item = new listItem(value);
+                    self.dataSource.push(item);
+                });
+                if (element) {
+                    var selectedValues = [];
+                    var selectedText = [];
+                    self.dataSource().forEach(function (data) {
+
+                        if (data.selected()) {
+                            selectedValues.push(data.value());
+                            selectedText.push(data.text());
+                        }
+                    });
+                    $(element).val(selectedValues);
+                    $(element).data('selectedValues', selectedText);
+                }
+            }
+            //
             self.showSearchBox = ko.observable(false);
             self.showSelectedItems = true;
+            self.searchBoxWidth = ko.observable(100);
+            self.dropdownWidth = ko.observable($(element).width());
             self.hasFocus = ko.observable(false);
+            self.hasFocus.subscribe(function (newValue) {
+                if (newValue) {
+                    self.isShowDropDown(false);
+                }
+            });
+
             self.isShowDropDown = ko.observable(true);
             //
-            self.searchBoxWidth = ko.observable(100);
-
             self.clearSearch = function () {
                 self.search("");
             }
@@ -61,7 +123,6 @@ ko.bindingHandlers.koSelect = {
                 self.selectedItemChanged(false);
                 $(element).trigger('change');
             }
-
             self.selectedItemChanged = function (item) {
                 self.hasFocus(true); // set focus to textbox
                 self.clearSearch();
@@ -90,8 +151,9 @@ ko.bindingHandlers.koSelect = {
                                     selectedValues.push(data.value());
                                     selectedText.push(data.text());
                                 }
-                            }
-                            else {
+
+                                // Select default if nothing is selected
+                            } else {
                                 selectedValues.push(data.value());
                                 selectedText.push(data.text());
                             }
@@ -106,7 +168,10 @@ ko.bindingHandlers.koSelect = {
 
                     // If nothing is selected selecte the default
                     if (selectedValues.length == 0) {
-                        self.dataSource()[0].selected(true);
+                        var oldListItem = self.dataSource()[0];
+                        var newListItem = new listItem({Text: oldListItem.text(), Value: oldListItem.value(), Selected: true });
+                        self.dataSource.replace(oldListItem, newListItem);
+
                         selectedValues.push(self.dataSource()[0].value());
                         selectedText.push(self.dataSource()[0].text());
                     }
@@ -116,12 +181,6 @@ ko.bindingHandlers.koSelect = {
                     $(element).data('selectedValues', selectedText);
                 }
             }
-
-            self.hasFocus.subscribe(function (newValue) {
-                if (newValue) {
-                    self.isShowDropDown(false);
-                }
-            });
             self.focus = function () {
                 self.isShowDropDown(true);
             }
@@ -137,26 +196,6 @@ ko.bindingHandlers.koSelect = {
                 self.searchBoxWidth(width + 10);
                 return true;
             }
-            self.addRange = function (data) {
-                self.dataSource.removeAll();
-                data.forEach(function (value) {
-                    var item = new listItem(value);
-                    self.dataSource.push(item);
-                });
-                if (element) {
-                    var selectedValues = [];
-                    var selectedText = [];
-                    self.dataSource().forEach(function (data) {
-
-                        if (data.selected()) {
-                            selectedValues.push(data.value());
-                            selectedText.push(data.text());
-                        }
-                    });
-                    $(element).val(selectedValues);
-                    $(element).data('selectedValues', selectedText);
-                }
-            }
 
             if (data) {
                 self.addRange(data);
@@ -165,15 +204,21 @@ ko.bindingHandlers.koSelect = {
 
         var options = valueAccessor();
 
-        options.update = function () {
-            console.log('Update Me');
-        }
-
         if (!options.listData()) {
             throw new Error("ko.bindingHandlers.koSelect: No data to display");
         }
 
         var model = new ViewModel(options.listData(), element);
+
+        // if click outside, close dropdown
+        $(document).mouseup(function(e){
+            // if the target of the click isn't the container...
+            // ... nor a descendant of the container
+            if (!$(element).is(e.target) && $(element).has(e.target).length === 0)
+            {
+                model.isShowDropDown(true);
+            }
+        });
 
         // create dropdown
         ko.bindingHandlers.koSelect.createNodes(element, model);
